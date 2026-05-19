@@ -1,0 +1,63 @@
+services:
+    boilerplate-app:
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        container_name: node-boilerplate-app
+        command: >
+            sh -c "
+            pnpm install &&
+            pnpm run db:migrate &&
+            pnpm run db:seed &&
+            pnpm run dev
+            "
+        ports:
+            - "5012:5012"
+        env_file:
+            - .env
+        volumes:
+            - .:/usr/src/app
+            - app_node_modules:/usr/src/app/node_modules
+            - ~/.aws:/root/.aws:ro
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost:5012/ || exit 1"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+            start_period: 30s
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_started
+    postgres:
+        image: postgres:16
+        container_name: node-boilerplate-postgres
+        environment:
+            POSTGRES_DB: nodeboilerplate
+            POSTGRES_USER: user
+            POSTGRES_PASSWORD: securepassword
+        ports:
+            - "5442:5432"
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U user -d nodeboilerplate"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+
+    redis:
+        image: redis:7
+        container_name: node-boilerplate-redis
+        ports:
+            - "6389:6379"
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5s
+            timeout: 3s
+            retries: 10
+
+volumes:
+    pgdata:
+    app_node_modules:
