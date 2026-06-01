@@ -275,7 +275,7 @@ export class EmailService {
             template: "otp-email",
             context: {
                 otp,
-                userName: userName || "User",
+                userName: userName || "Chief",
                 expiryMinutes: OTP_CONFIG.EXPIRY_SECONDS / 60,
                 supportEmail: envConfig.email.supportEmail
             }
@@ -289,10 +289,10 @@ export class EmailService {
             template: "login-verification",
             context: {
                 otp,
-                userName: userName || "User",
+                userName: userName || "Chief",
                 expiryMinutes: OTP_CONFIG.EXPIRY_SECONDS / 60,
-                supportEmail: envConfig.email.supportEmail
-            }
+                supportEmail: envConfig.email.supportEmail,
+            },
         });
     }
 
@@ -303,7 +303,7 @@ export class EmailService {
             template: "forgot-password",
             context: {
                 otp,
-                userName: userName || "User",
+                userName: userName || "Chief",
                 expiryHours: 24,
                 supportEmail: envConfig.email.supportEmail
             }
@@ -317,7 +317,7 @@ export class EmailService {
             template: "update-user-profile",
             context: {
                 otp,
-                userName: userName || "User",
+                userName: userName || "Chief",
                 expiryMinutes: OTP_CONFIG.EXPIRY_SECONDS / 60,
                 supportEmail: envConfig.email.supportEmail
             }
@@ -330,7 +330,7 @@ export class EmailService {
             subject: "Password Reset Successful - Verxa",
             template: "reset-password",
             context: {
-                userName: userName || "User",
+                userName: userName || "Chief",
                 loginLink: `${envConfig.baseUrl}/login`,
                 supportEmail: envConfig.email.supportEmail
             }
@@ -354,7 +354,7 @@ export class EmailService {
             subject: `New Login Notification - IP: ${ipAddress}`,
             template: "login-security-alert",
             context: {
-                userName: userName || "",
+                userName: userName || "Chief",
                 userEmail: to,
                 loginTime: loginDetails.loginTime,
                 ipAddress: loginDetails.ipAddress,
@@ -393,7 +393,7 @@ export class EmailService {
             subject: `🚨 SECURITY ALERT: Login from Different Country - ${loginDetails.location || ipAddress}`,
             template: "different-country-login-alert",
             context: {
-                userName: userName || "User",
+                userName: userName || "Chief",
                 userEmail: to,
                 loginTime: loginDetails.loginTime,
                 ipAddress: loginDetails.ipAddress,
@@ -438,7 +438,7 @@ export class EmailService {
             subject: `Security Alert - ${alertDetails.attemptCount} Failed Login Attempts - Verxa`,
             template: "failed-login-attempt",
             context: {
-                userName: userName || "User",
+                userName: userName || "Chief",
                 attemptCount: alertDetails.attemptCount,
                 lastAttemptTime: alertDetails.lastAttemptTime,
                 ipAddress: alertDetails.ipAddress,
@@ -474,7 +474,7 @@ export class EmailService {
             subject: `Verxa ID updated successfully`,
             template: "verxaid-updated",
             context: {
-                userName: userName || "User",
+                userName: userName || "Chief",
                 oldUsername: oldUsername,
                 newUsername: newUsername,
                 updateTime: updateTime.toLocaleDateString("en-US", {

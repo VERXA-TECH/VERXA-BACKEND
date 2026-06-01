@@ -211,9 +211,17 @@ export default class RedisManager {
         await client.del(key);
     }
 
-    async incr(key: string): Promise<number> {
+     async incr(key: string): Promise<number> {
         const client = await this.getClientOrConnect();
         return client.incr(key);
+    }
+
+    async incrEx(key: string, ttlSeconds: number): Promise<number> {
+        const client = await this.getClientOrConnect();
+        const result = await (
+            client as unknown as { incrWithExpire: (k: string, ttl: string) => Promise<unknown> }
+        ).incrWithExpire(key, ttlSeconds.toString());
+        return Number(result);
     }
 
     async expire(key: string, ttlSeconds: number): Promise<void> {
@@ -224,6 +232,12 @@ export default class RedisManager {
     async ttl(key: string): Promise<number> {
         const client = await this.getClientOrConnect();
         return client.ttl(key);
+    }
+
+
+    async getDel(key: string): Promise<string | null> {
+        const client = await this.getClientOrConnect();
+        return client.getdel(key);
     }
 }
 
@@ -242,7 +256,9 @@ export const redis = {
     expire: (key: string, ttl: number) => redisManager.expire(key, ttl),
     ttl: (key: string) => redisManager.ttl(key),
     exists: (...keys: string[]) => redisManager.exists(...keys),
-    getClient: () => redisManager.getClientOrConnect()
+    getClient: () => redisManager.getClientOrConnect(),
+     getDel: (key: string) => redisManager.getDel(key),
+     incrEx: (key: string, ttl: number) => redisManager.incrEx(key, ttl),
 };
 
 // Graceful shutdown

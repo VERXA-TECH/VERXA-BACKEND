@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { eq, sql, and, ne, desc, isNull, asc, inArray, notInArray } from "drizzle-orm";
+ import { customAlphabet }  from "nanoid";
+
 import { DbClient, getDb } from "../config/db";
 import {
     users,
@@ -12,10 +14,7 @@ import {
     AvatarHistoryEntry
 } from "../db/schema/users.schema";
 import { PersonalInformation } from "../validators/user.validator";
-
-
 import { kyc_applications, kyc_profiles } from "../db/schema/kyc/kyc.schema";
-
 import { transactions } from "../db/schema/finance/transactions.schema";
 
 export type { User, NewUser, AvatarHistory, AvatarHistoryEntry };
@@ -50,7 +49,6 @@ export class UserRepository {
         return this.db;
     }
 
-
     async archiveDueBatch(batchSize: number): Promise<{ count: number; ids: string[] }> {
         const res = (await this.db.execute(
             sql /* sql */ `
@@ -76,7 +74,7 @@ export class UserRepository {
       FROM to_archive ta
       WHERE u."id" = ta."id"
       RETURNING u."id"::text AS id;
-    `
+    `,
         )) as unknown as { rows?: Array<{ id: string }>; rowCount?: number };
 
         const ids = res.rows?.map((r) => r.id) ?? [];
@@ -95,7 +93,7 @@ export class UserRepository {
             .set({
                 deleteRequestedAt: null,
                 deleteEffectiveAt: null,
-                archiveReason: null
+                archiveReason: null,
             })
             .where(eq(users.id, userId));
     }
@@ -108,7 +106,7 @@ export class UserRepository {
             .set({
                 deleteRequestedAt: now,
                 deleteEffectiveAt: effective,
-                archiveReason: reason
+                archiveReason: reason,
             })
             .where(eq(users.id, userId));
     }
@@ -120,7 +118,7 @@ export class UserRepository {
                 mfaEnabled: users.mfaEnabled,
                 mfaSecretEnc: users.mfaSecretEnc,
                 email: users.email,
-                username: users.username
+                username: users.username,
             })
             .from(users)
             .where(eq(users.id, userId))
@@ -165,7 +163,7 @@ export class UserRepository {
                 isArchived: users.isArchived,
                 avatar: users.avatar,
                 unlockPinSet: sql<boolean>`(${users.unlockPinHash} IS NOT NULL)`,
-                transactionPinSet: sql<boolean>`(${users.txnPinHash} IS NOT NULL)`
+                transactionPinSet: sql<boolean>`(${users.txnPinHash} IS NOT NULL)`,
             })
             .from(users)
             .where(eq(users.id, id))
@@ -204,7 +202,7 @@ export class UserRepository {
             .where(
                 excludeUserId
                     ? and(sql`lower(${users.username}) = ${username.toLowerCase()}`, ne(users.id, excludeUserId))
-                    : sql`lower(${users.username}) = ${username.toLowerCase()}`
+                    : sql`lower(${users.username}) = ${username.toLowerCase()}`,
             )
             .limit(1);
         return !rows[0];
@@ -268,11 +266,6 @@ export class UserRepository {
         return { updated: (result.rowCount ?? 0) > 0 };
     }
 
-    async checkDuplicateReferralCode(referralCode: string) {
-        const result = await this.db.select().from(users).where(eq(users.referralCode, referralCode)).limit(1);
-        return result[0];
-    }
-
     async updateUnlockPin(userId: string, unlockPinHash: string) {
         await this.db.update(users).set({ unlockPinHash }).where(eq(users.id, userId));
     }
@@ -281,7 +274,6 @@ export class UserRepository {
         await this.db.update(users).set({ txnPinHash }).where(eq(users.id, userId));
     }
 
-  
     async updateCurrency(userId: string, currency: Currency): Promise<void> {
         await this.db.update(users).set({ currency }).where(eq(users.id, userId));
     }
@@ -312,7 +304,7 @@ export class UserRepository {
         userId: string,
         avatarUrl: string,
         storageKey: string,
-        db: DbClient = this.db
+        db: DbClient = this.db,
     ): Promise<{ removedAvatar?: { url: string; key: string } }> {
         const MAX_HISTORY_SIZE = 5;
 
@@ -330,13 +322,13 @@ export class UserRepository {
 
             const avatarHistory: AvatarHistory = user[0].avatarHistory || {
                 current: null,
-                history: []
+                history: [],
             };
 
             const newEntry: AvatarHistoryEntry = {
                 url: avatarUrl,
                 uploadedAt: new Date(),
-                key: storageKey
+                key: storageKey,
             };
 
             // FIFO logic: remove oldest if at capacity
@@ -356,7 +348,7 @@ export class UserRepository {
                 .update(users)
                 .set({
                     avatar: avatarUrl,
-                    avatarHistory: avatarHistory as any
+                    avatarHistory: avatarHistory as any,
                 })
                 .where(eq(users.id, userId));
 
@@ -413,7 +405,7 @@ export class UserRepository {
                 .update(users)
                 .set({
                     avatar: avatarUrl,
-                    avatarHistory: avatarHistory as any
+                    avatarHistory: avatarHistory as any,
                 })
                 .where(eq(users.id, userId));
         });
@@ -467,7 +459,7 @@ export class UserRepository {
         return {
             total: Number(totalReferrals.rows?.[0]?.total_referrals || 0),
             verified: Number(verifiedReferrals.rows?.[0]?.verified_referrals || 0),
-            recent: Number(recentReferrals.rows?.[0]?.recent_referrals || 0)
+            recent: Number(recentReferrals.rows?.[0]?.recent_referrals || 0),
         };
     }
 
@@ -488,7 +480,7 @@ export class UserRepository {
         return (
             result.rows?.map((row) => ({
                 country: row.country,
-                count: Number(row.count)
+                count: Number(row.count),
             })) || []
         );
     }
@@ -509,7 +501,7 @@ export class UserRepository {
         return (
             result.rows?.map((row) => ({
                 month: row.month,
-                referralsCount: Number(row.referrals_count)
+                referralsCount: Number(row.referrals_count),
             })) || []
         );
     }
@@ -519,7 +511,7 @@ export class UserRepository {
             .select({
                 id: users.id,
                 pushNotificationEnabled: users.pushNotificationEnabled,
-                emailNotificationEnabled: users.emailNotificationEnabled
+                emailNotificationEnabled: users.emailNotificationEnabled,
             })
             .from(users)
             .where(eq(users.id, userId))
@@ -532,7 +524,7 @@ export class UserRepository {
             .select({
                 id: users.id,
                 pushNotificationEnabled: users.pushNotificationEnabled,
-                emailNotificationEnabled: users.emailNotificationEnabled
+                emailNotificationEnabled: users.emailNotificationEnabled,
             })
             .from(users)
             .where(inArray(users.id, userIds));
@@ -541,7 +533,7 @@ export class UserRepository {
 
     async updateNotificationPreference(
         userId: string,
-        options: { pushNotificationEnabled?: boolean; emailNotificationEnabled?: boolean }
+        options: { pushNotificationEnabled?: boolean; emailNotificationEnabled?: boolean },
     ) {
         const { pushNotificationEnabled, emailNotificationEnabled } = options;
         await this.db
@@ -552,7 +544,7 @@ export class UserRepository {
 
     async updateTelegramSettings(
         userId: string,
-        data: { telegramChatId?: string | null; telegramLinkedAt?: Date | null; telegramNotificationEnabled?: boolean }
+        data: { telegramChatId?: string | null; telegramLinkedAt?: Date | null; telegramNotificationEnabled?: boolean },
     ) {
         await this.db.update(users).set(data).where(eq(users.id, userId));
     }
@@ -572,7 +564,7 @@ export class UserRepository {
                 provisioned: sql<number>`count(*) filter (where NOT ${hasTransaction} AND ${users.isActive} = true)`,
                 inactive: sql<number>`count(*) filter (where ${users.isActive} = false)`,
                 pnd: sql<number>`count(*) filter (where ${users.isPnd} = true)`,
-                archived: sql<number>`count(*) filter (where ${users.isArchived} = true)`
+                archived: sql<number>`count(*) filter (where ${users.isArchived} = true)`,
             })
             .from(users)
             .where(eq(users.role, Role.BASIC_USER));
@@ -583,7 +575,34 @@ export class UserRepository {
             provisioned: Number(result?.provisioned || 0),
             inactive: Number(result?.inactive || 0),
             pnd: Number(result?.pnd || 0),
-            archived: Number(result?.archived || 0)
+            archived: Number(result?.archived || 0),
         };
+    }
+
+    async checkDuplicateReferralCode(referralCode: string, db: DbClient = this.db): Promise<boolean> {
+        const [userExists] = await Promise.all([
+            db.select({ id: users.id }).from(users).where(eq(users.referralCode, referralCode)).limit(1),
+        ]);
+        return userExists.length > 0;
+    }
+
+    async generateUniqueReferralCode(length = 5, db: DbClient = this.db): Promise<string> {
+       
+        const generate = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ", length);
+        let code = generate();
+        let exists = await this.checkDuplicateReferralCode(code, db);
+
+        let attempts = 0;
+        while (exists && attempts < 10) {
+            code = generate();
+            exists = await this.checkDuplicateReferralCode(code, db);
+            attempts++;
+        }
+
+        if (exists) {
+            throw new Error("Failed to generate a unique referral code after 10 attempts");
+        }
+
+        return code;
     }
 }
