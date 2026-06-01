@@ -39,7 +39,6 @@ export enum Language {
 
 export enum Role {
     BASIC_USER = "basic-user",
-    MERCHANT = "merchant",
     ADMIN = "admin",
     SUPER_ADMIN = "super-admin"
 }
@@ -70,10 +69,13 @@ export const users = pgTable(
         txnPinHash: varchar("txn_pin_hash", { length: 255 }),
         biometricEnabled: boolean("biometric_enabled").default(false),
         firstName: varchar("first_name", { length: 100 }),
+        middleName: varchar("middle_name", { length: 100 }),
         lastName: varchar("last_name", { length: 100 }),
+        gender: varchar("gender", { length: 50 }),
         phoneNumber: varchar("phone_number", { length: 20 }),
         avatar: varchar("avatar", { length: 255 }),
         avatarHistory: jsonb("avatar_history").$type<AvatarHistory>(),
+        purposes: jsonb("purposes").$type<string[]>(),
         country: varchar("country", { length: 2 }),
         currency: text("currency", { enum: CURRENCIES }).$type<Currency>().default(Currency.USDT).notNull(),
         language: text("language", { enum: LANGUAGES }).$type<Language>().default(Language.EN_US).notNull(),

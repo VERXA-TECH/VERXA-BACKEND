@@ -27,6 +27,7 @@ import { getRedisClient } from "./config/redis";
 
 // Workers / Queues
 import "./queues/daily.queue";
+import "./queues/email.queue";
 
 import globalErrorHandler from "./controllers/error.controller";
 import { initPurgeOldQuotesJob } from "./jobs/purge-old-quotes";

@@ -17,3 +17,4 @@ export * from "./finance/transactions.schema";
 export * from "./kyc/kyc.schema";
 export * from "./devices.schema";
 export * from "./device-trust-token-history.schema";
+export * from "./assets.schema";

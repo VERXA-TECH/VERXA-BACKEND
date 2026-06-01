@@ -98,11 +98,11 @@ export const globalRateLimiter = createRateLimiter({
     duration: 15 * 60
 });
 
-// Signup limiter: 5 attempts per 2 hours combining IP + email to reduce abuse
+// Signup limiter: 3 attempts per hour combining IP + email to reduce abuse
 export const signupRateLimiter = createRateLimiter({
     keyPrefix: "rl:signup",
-    points: 5,
-    duration: 2 * 60 * 60,
+    points: 3,
+    duration: 60 * 60,
     keyGenerator: (req) => {
         const xff = req.headers["x-forwarded-for"];
         const forwarded = Array.isArray(xff) ? xff[0] : xff;

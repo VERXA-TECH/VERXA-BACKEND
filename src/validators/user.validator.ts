@@ -302,4 +302,69 @@ export default class UserValidator {
     static toggleBiometrics(data: ToggleBiometricsBody) {
         return toggleBiometricsSchema.safeParse(data);
     }
+    static basicProfile(data: any) {
+        return basicProfileSchema.safeParse(data);
+    }
+    static createPassword(data: any) {
+        return createPasswordSchema.safeParse(data);
+    }
+    static updatePurposes(data: any) {
+        return userPurposesSchema.safeParse(data);
+    }
 }
+
+export const basicProfileSchema = z.object({
+    firstName: z
+        .string({ required_error: "First name is required" })
+        .min(2, "First name must be at least 2 characters long")
+        .max(50, "First name must be at most 50 characters long")
+        .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/, "First name can only contain letters, spaces, hyphens, or apostrophes"),
+    middleName: z
+        .string()
+        .max(50, "Middle name must be at most 50 characters long")
+        .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/, "Middle name can only contain letters, spaces, hyphens, or apostrophes")
+        .optional()
+        .nullable(),
+    lastName: z
+        .string({ required_error: "Last name is required" })
+        .min(2, "Last name must be at least 2 characters long")
+        .max(50, "Last name must be at most 50 characters long")
+        .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/, "Last name can only contain letters, spaces, hyphens, or apostrophes"),
+    gender: z
+        .string({ required_error: "Gender is required" })
+        .min(1, "Gender is required")
+        .max(20, "Gender too long"),
+    phoneNumber: z
+        .string({ required_error: "Phone number is required" })
+        .regex(/^\+234[789][01]\d{8}$/, "Phone number must be a valid Nigerian number in international format (+234...)"),
+    referralCode: z
+        .string()
+        .regex(/^VX-[A-Z0-9]{7}$/, "Referral code format must be VX-{7 characters}")
+        .optional()
+        .nullable()
+        .or(z.literal(""))
+});
+export type BasicProfileBody = z.infer<typeof basicProfileSchema>;
+
+export const createPasswordSchema = z
+    .object({
+        password: z
+            .string({ required_error: "Password is required" })
+            .min(8, "Password must be at least 8 characters long")
+            .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+            .regex(/[0-9]/, "Password must contain at least one number")
+            .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
+        confirmPassword: z.string({ required_error: "Confirm password is required" })
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords do not match",
+        path: ["confirmPassword"]
+    });
+export type CreatePasswordBody = z.infer<typeof createPasswordSchema>;
+
+export const userPurposesSchema = z.object({
+    purposes: z
+        .array(z.string().min(1, "Purpose cannot be empty"), { required_error: "Purposes are required" })
+        .min(1, "At least one purpose must be selected")
+});
+export type UserPurposesBody = z.infer<typeof userPurposesSchema>;

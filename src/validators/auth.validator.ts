@@ -1,52 +1,31 @@
 import Joi from "joi";
+import envConfig from "../config/env";
 
 export default class AuthValidator {
     static signup(data: any): Joi.ValidationResult {
-
-        if (data.firstName) {
-            data.firstName = data.firstName
-                .replace(/[^A-Za-z\s-]/g, " ")
-                .replace(/\s+/g, " ")
-                .trim();
-        }
-        if (data.lastName) {
-            data.lastName = data.lastName
-                .replace(/[^A-Za-z\s-]/g, " ")
-                .replace(/\s+/g, " ")
-                .trim();
-        }
-
         const schema = Joi.object().keys({
-            firstName: Joi.string()
+            email: Joi.string()
+                .trim()
+                .lowercase()
+                .email()
                 .required()
-                .regex(/^[A-Za-z]+(?:[ -][A-Za-z]+)*$/)
+                .custom((value, helpers) => {
+                    if (envConfig.env !== "development" && value.includes("+")) {
+                        return helpers.message({ custom: "Email address cannot contain a plus (+) symbol." });
+                    }
+                    return value;
+                })
                 .messages({
-                    "string.empty": "First name is required.",
-                    "string.pattern.base": "First name can only contain letters, spaces, and hyphens.",
+                    "string.empty": "Email is required.",
+                    "string.email": "Please provide a valid email address.",
                 }),
-            lastName: Joi.string()
+            country: Joi.string()
                 .required()
-                .regex(/^[A-Za-z]+(?:[ -][A-Za-z]+)*$/)
+                .valid("NG")
                 .messages({
-                    "string.empty": "Last name is required.",
-                    "string.pattern.base": "Last name can only contain letters, spaces, and hyphens.",
+                    "string.empty": "Country is required.",
+                    "any.only": "Only Nigeria (NG) is supported as a country code.",
                 }),
-            email: Joi.string().email().required().messages({
-                "string.empty": "Email is required.",
-                "string.email": "Please provide a valid email address.",
-            }),
-            password: Joi.string().required().messages({
-                "string.empty": "Password is required.",
-            }),
-            phoneNumber: Joi.string().optional().messages({
-                "string.base": "Phone number must be a string.",
-            }),
-            country: Joi.string().optional().messages({
-                "string.base": "Country must be a string.",
-            }),
-            referrer: Joi.string().optional().messages({
-                "string.base": "Referrer must be a string.",
-            }),
             deviceInfo: Joi.object()
                 .required()
                 .keys({
@@ -66,6 +45,65 @@ export default class AuthValidator {
         });
 
         return schema.validate(data, { abortEarly: false });
+    }
+
+    static sendOtp(data: any): Joi.ValidationResult {
+        const schema = Joi.object().keys({
+            email: Joi.string().email().required().messages({
+                "string.empty": "Email is required.",
+                "string.email": "Please provide a valid email address.",
+            }),
+            purpose: Joi.string()
+                .required()
+                .valid(
+                    "signup_verification",
+                    "login_device_verification",
+                    "forgot_password",
+                    "reset_transaction_pin",
+                    "update_transaction_pin",
+                    "disable_mfa",
+                    "update_user_profile"
+                )
+                .messages({
+                    "string.empty": "Purpose is required.",
+                    "any.only": "Invalid OTP purpose.",
+                }),
+        });
+        return schema.validate(data);
+    }
+
+    static validateOtp(data: any): Joi.ValidationResult {
+        const schema = Joi.object().keys({
+            email: Joi.string().email().required().messages({
+                "string.empty": "Email is required.",
+                "string.email": "Please provide a valid email address.",
+            }),
+            otp: Joi.string().length(6).required().messages({
+                "string.empty": "OTP is required.",
+                "string.length": "OTP must be exactly 6 characters.",
+            }),
+            purpose: Joi.string()
+                .required()
+                .valid(
+                    "signup_verification",
+                    "login_device_verification",
+                    "forgot_password",
+                    "reset_transaction_pin",
+                    "update_transaction_pin",
+                    "disable_mfa",
+                    "update_user_profile"
+                )
+                .messages({
+                    "string.empty": "Purpose is required.",
+                    "any.only": "Invalid OTP purpose.",
+                }),
+            deviceInfo: Joi.object().optional().keys({
+                name: Joi.string().required(),
+                os: Joi.string().required(),
+                uniqueId: Joi.string().required()
+            })
+        });
+        return schema.validate(data);
     }
 
     static signin(data: any): Joi.ValidationResult {
