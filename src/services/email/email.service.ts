@@ -271,7 +271,7 @@ export class EmailService {
     async sendOtpEmail(to: string, otp: string, userName?: string): Promise<boolean> {
         return this.sendEmail({
             to,
-            subject: "Your Verification Code - Jeroid Pay",
+            subject: "Your Verification Code - Verxa",
             template: "otp-email",
             context: {
                 otp,
@@ -285,7 +285,7 @@ export class EmailService {
     async sendLoginVerificationEmail(to: string, otp: string, userName?: string): Promise<boolean> {
         return this.sendEmail({
             to,
-            subject: "Login Verification Code - Jeroid Pay",
+            subject: "Login Verification Code - Verxa",
             template: "login-verification",
             context: {
                 otp,
@@ -299,7 +299,7 @@ export class EmailService {
     async sendForgotPasswordEmail(to: string, otp: string, userName?: string): Promise<boolean> {
         return this.sendEmail({
             to,
-            subject: "Reset Your Password - Jeroid Pay",
+            subject: "Reset Your Password - Verxa",
             template: "forgot-password",
             context: {
                 otp,
@@ -313,7 +313,7 @@ export class EmailService {
     async sendUpdateUserProfileEmail(to: string, otp: string, userName?: string): Promise<boolean> {
         return this.sendEmail({
             to,
-            subject: "Profile Update Verification Code - JeroidPay",
+            subject: "Profile Update Verification Code - Verxa",
             template: "update-user-profile",
             context: {
                 otp,
@@ -327,7 +327,7 @@ export class EmailService {
     async sendResetPasswordEmail(to: string, userName?: string): Promise<boolean> {
         return this.sendEmail({
             to,
-            subject: "Password Reset Successful - Jeroid Pay",
+            subject: "Password Reset Successful - Verxa",
             template: "reset-password",
             context: {
                 userName: userName || "User",
@@ -418,7 +418,7 @@ export class EmailService {
     async sendOnboardingEmail(to: string, userName?: string): Promise<boolean> {
         return this.sendEmail({
             to,
-            subject: "JeroidPay - Welcome to JeroidPay",
+            subject: "Verxa - Welcome to Verxa",
             template: "onboarding-email",
             context: {
                 userName: userName || "User",
@@ -435,7 +435,7 @@ export class EmailService {
     async sendFailedLoginAttemptsAlert(to: string, alertDetails: AlertDetails, userName?: string): Promise<boolean> {
         const success = await this.sendEmail({
             to,
-            subject: `Security Alert - ${alertDetails.attemptCount} Failed Login Attempts - Jeroid Pay`,
+            subject: `Security Alert - ${alertDetails.attemptCount} Failed Login Attempts - Verxa`,
             template: "failed-login-attempt",
             context: {
                 userName: userName || "User",
@@ -462,7 +462,7 @@ export class EmailService {
         return success;
     }
 
-    async sendJeroidPayIdUpdatedEmail(
+    async sendVerxaIdUpdatedEmail(
         to: string,
         userName: string,
         oldUsername: string,
@@ -471,8 +471,8 @@ export class EmailService {
     ): Promise<boolean> {
         const success = await this.sendEmail({
             to,
-            subject: `JeroidPay ID updated successfully`,
-            template: "jeroidpayid-updated",
+            subject: `Verxa ID updated successfully`,
+            template: "verxaid-updated",
             context: {
                 userName: userName || "User",
                 oldUsername: oldUsername,
@@ -491,7 +491,7 @@ export class EmailService {
         });
 
         if (success) {
-            logger.info("JeroidPay ID updated successfully", {
+            logger.info("Verxa ID updated successfully", {
                 to: to,
                 userName: userName,
                 oldUsername: oldUsername,
@@ -504,7 +504,7 @@ export class EmailService {
                     minute: "2-digit",
                     timeZoneName: "short"
                 }),
-                action: "jeroidpayid_updated"
+                action: "verxaid_updated"
             });
         }
         return success;
@@ -532,7 +532,7 @@ export class EmailService {
         const title = titleMap[metadata.type];
         return this.sendEmail({
             to,
-            subject: "JeroidPay - Wallet Transaction",
+            subject: "Verxa - Wallet Transaction",
             template: "wallet-transaction",
             context: {
                 userName: metadata.userName,
@@ -618,7 +618,7 @@ export class EmailService {
         const title = metadata.status === "success" ? "Card Transaction Successful!  " : "Card Transaction Failed!";
         return this.sendEmail({
             to,
-            subject: "JeroidPay - Card Transaction",
+            subject: "Verxa - Card Transaction",
             template: "card-transaction",
             context: {
                 userName: metadata.userName,
@@ -641,7 +641,7 @@ export class EmailService {
     ): Promise<boolean> {
         const success = await this.sendEmail({
             to: email,
-            subject: "Transaction PIN Created - JeroidPay",
+            subject: "Transaction PIN Created - Verxa",
             template: "transaction-pin-created",
             context: {
                 userName: userName || email.split("@")[0],
@@ -680,7 +680,7 @@ export class EmailService {
         const title = metadata.status === "completed" ? "Swap Successful!" : "Swap Failed!";
         return this.sendEmail({
             to,
-            subject: "JeroidPay - Currency Swap",
+            subject: "Verxa - Currency Swap",
             template: "swap-transaction",
             context: {
                 userName: metadata.userName,
@@ -705,7 +705,7 @@ export class EmailService {
     ): Promise<boolean> {
         const success = await this.sendEmail({
             to: email,
-            subject: "Transaction PIN Successfully Reset - JeroidPay",
+            subject: "Transaction PIN Successfully Reset - Verxa",
             template: "transaction-pin-reset-success",
             context: {
                 userName: userName || email.split("@")[0],
@@ -735,7 +735,7 @@ export class EmailService {
     ): Promise<boolean> {
         return this.sendEmail({
             to,
-            subject: `Transaction PIN Reset Temporarily Blocked  - JeroidPay`,
+            subject: `Transaction PIN Reset Temporarily Blocked  - Verxa`,
             template: "transaction-pin-reset-blocked",
             context: {
                 userName: userName || "User",
@@ -764,7 +764,7 @@ export class EmailService {
 
         return this.sendEmail({
             to,
-            subject: "Your JeroidPay eSIM QR Code - Claim Ownership",
+            subject: "Your Verxa eSIM QR Code - Claim Ownership",
             template: "esim-qrcode",
             context: {
                 userName: metadata.userName,
@@ -941,7 +941,7 @@ export class EmailService {
     async sendAdminInvitationEmail(to: string, inviteUrl: string): Promise<boolean> {
         return this.sendEmail({
             to,
-            subject: "Admin Dashboard Invitation - JeroidPay",
+            subject: "Admin Dashboard Invitation - Verxa",
             template: "admin-invitation",
             context: {
                 inviteUrl,
@@ -965,7 +965,7 @@ export class EmailService {
 
         return this.sendEmail({
             to,
-            subject: `KYC Verification Successful - JeroidPay`,
+            subject: `KYC Verification Successful - Verxa`,
             template: "kyc-verification-successful",
             context: {
                 userName: userName || "User",
@@ -994,7 +994,7 @@ export class EmailService {
 
         return this.sendEmail({
             to,
-            subject: `KYC Verification Failed - JeroidPay`,
+            subject: `KYC Verification Failed - Verxa`,
             template: "kyc-verification-failed",
             context: {
                 userName: userName || "User",
@@ -1020,7 +1020,7 @@ export class EmailService {
 
         return this.sendEmail({
             to,
-            subject: `Account Upgraded - JeroidPay`,
+            subject: `Account Upgraded - Verxa`,
             template: "kyc-tier-upgrade",
             context: {
                 userName: userName || "User",

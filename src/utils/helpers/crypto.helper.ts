@@ -2,11 +2,11 @@ import crypto from "node:crypto";
 import envConfig from "../../config/env";
 import logger from "../../config/logger";
 
-const HKDF_SALT = Buffer.from("jeroidpay-hkdf-salt-v1", "utf8");
+const HKDF_SALT = Buffer.from("verxa-hkdf-salt-v1", "utf8");
 
 export function deriveTypeSpecificKey(masterKeyB64: string, cipherType: string): string {
     const masterKey = Buffer.from(masterKeyB64, "base64");
-    const info = `jeroidpay-cipher-${cipherType}`;
+    const info = `verxa-cipher-${cipherType}`;
     const derivedKey = crypto.hkdfSync("sha256", masterKey, HKDF_SALT, info, 32);
     return Buffer.from(derivedKey).toString("base64");
 }

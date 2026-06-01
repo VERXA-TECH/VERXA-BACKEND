@@ -1,8 +1,8 @@
 {
-    "name": "jeroid-pay-server",
+    "name": "verxa-server",
     "version": "1.0.0",
     "main": "index.js",
-    "repository": "https://github.com/jeroidpay/jeroidpay-server",
+    "repository": "https://github.com/verxa/verxa-backend",
     "author": "Johnson-Awah Alfred <johnsonmessilo19@gmail.com>",
     "contributors": [
         "Johnson-Awah Alfred <johnsonmessilo19@gmail.com>"

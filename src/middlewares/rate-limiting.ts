@@ -305,7 +305,7 @@ export const verifyMfaRateLimiter = createRateLimiter({
         const emailService = new EmailService();
         await emailService.sendEmail({
             to: email,
-            subject: "MFA Temporarily Locked Due to Too Many Attempts - Jeroid Pay",
+            subject: "MFA Temporarily Locked Due to Too Many Attempts - Verxa",
             template: "mfa-blocked",
             context: {
                 retryMinutes: Math.ceil(retrySecs / 60),
@@ -348,7 +348,7 @@ export const failedLoginAttemptsRateLimiter = createRateLimiter({
         const emailService = new EmailService();
         await emailService.sendEmail({
             to: email,
-            subject: "Security Alert - Login Blocked - JeroidPay",
+            subject: "Security Alert - Login Blocked - Verxa",
             template: "login-security-alert",
             context: {
                 retryMinutes: Math.ceil(retrySecs / 60),

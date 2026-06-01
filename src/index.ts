@@ -127,7 +127,7 @@ app.use(globalErrorHandler);
 
 const port = process.env.PORT || 8000;
 const server = app.listen(port, () => {
-    logger.info(`Jeroid Pay Server running faster than you, on port: ${port}`);
+    logger.info(`Verxa Server running faster than you, on port: ${port}`);
 });
 
 try {

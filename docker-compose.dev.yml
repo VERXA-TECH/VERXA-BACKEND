@@ -1,9 +1,9 @@
 services:
-    boilerplate-app:
+    verxa-app:
         build:
             context: .
             dockerfile: Dockerfile.dev
-        container_name: node-boilerplate-app
+        container_name: verxa-app
         command: >
             sh -c "
             pnpm install &&
@@ -32,7 +32,7 @@ services:
                 condition: service_started
     postgres:
         image: postgres:16
-        container_name: node-boilerplate-postgres
+        container_name: verxa-postgres
         environment:
             POSTGRES_DB: nodeboilerplate
             POSTGRES_USER: user
@@ -49,7 +49,7 @@ services:
 
     redis:
         image: redis:7
-        container_name: node-boilerplate-redis
+        container_name: verxa-redis
         ports:
             - "6389:6379"
         healthcheck:

@@ -87,8 +87,8 @@ const envConfig = {
     jwt: {
         secret: requireEnv("JWT_SECRET", process.env.JWT_SECRET),
         expiresIn: process.env.JWT_EXPIRES_IN || "1d",
-        issuer: process.env.JWT_ISSUER || "jeroid",
-        audience: process.env.JWT_AUDIENCE || "jeroid-pay-users",
+        issuer: process.env.JWT_ISSUER || "verxa",
+        audience: process.env.JWT_AUDIENCE || "verxa-users",
         refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "30d"
     },
 
@@ -130,9 +130,9 @@ const envConfig = {
         provider: process.env.EMAIL_PROVIDER || "sendgrid",
 
         from: process.env.SMTP_FROM || "me@shodipoayomide.com",
-        fromName: process.env.SMTP_FROM_NAME || "Jeroid Pay",
-        adminEmail: process.env.ADMIN_EMAIL || "admin@jeroidpay.com",
-        supportEmail: process.env.SUPPORT_EMAIL || "support@jeroidpay.com",
+        fromName: process.env.SMTP_FROM_NAME || "Verxa",
+        adminEmail: process.env.ADMIN_EMAIL || "admin@verxa.com",
+        supportEmail: process.env.SUPPORT_EMAIL || "support@verxa.com",
 
         sendgridApiKey: process.env.SENDGRID_API_KEY || "",
         sendgridWebhookSecret: process.env.SENDGRID_WEBHOOK_SECRET || "",
@@ -193,7 +193,7 @@ const envConfig = {
     },
    
 
-    adminEmail: process.env.ADMIN_EMAIL || "admin@jeroidpay.com",
+    adminEmail: process.env.ADMIN_EMAIL || "admin@verxa.com",
     adminPassword: process.env.ADMIN_PASSWORD,
     adminUsername: process.env.ADMIN_USERNAME || "admin",
     adminFirstName: process.env.ADMIN_FIRST_NAME || "Admin",
@@ -211,8 +211,8 @@ const envConfig = {
     telegram: {
         botToken: requireEnv("TELEGRAM_BOT_TOKEN", process.env.TELEGRAM_BOT_TOKEN),
         webHookSecret: requireEnv("TELEGRAM_WEBHOOK_SECRET", process.env.TELEGRAM_WEBHOOK_SECRET),
-        botUsername: process.env.TELEGRAM_BOT_USERNAME || "JeroidPayBot",
-        supportEmail: process.env.TELEGRAM_SUPPORT_EMAIL || "support@jeroidpay.com"
+        botUsername: process.env.TELEGRAM_BOT_USERNAME || "VerxaBot",
+        supportEmail: process.env.TELEGRAM_SUPPORT_EMAIL || "support@verxa.com"
     },
 
     audit: {
@@ -225,8 +225,8 @@ const envConfig = {
         expiresInMs: toNumber(process.env.ADMIN_INVITE_EXPIRES_MS, 24 * 60 * 60 * 1000) // 24 hours default
     },
     security: {
-        alertEmail: process.env.SECURITY_ALERT_EMAIL || process.env.ADMIN_EMAIL || "security@jeroidpay.com",
-        escalationEmail: process.env.ESCALATION_EMAIL || process.env.ADMIN_EMAIL || "security@jeroidpay.com"
+        alertEmail: process.env.SECURITY_ALERT_EMAIL || process.env.ADMIN_EMAIL || "security@verxa.com",
+        escalationEmail: process.env.ESCALATION_EMAIL || process.env.ADMIN_EMAIL || "security@verxa.com"
     },
     socket: {
         allowedOrigins: parseEnvArray(process.env.SOCKET_ALLOWED_ORIGINS, [])
