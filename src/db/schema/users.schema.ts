@@ -79,7 +79,6 @@ export const users = pgTable(
         country: varchar("country", { length: 2 }),
         currency: text("currency", { enum: CURRENCIES }).$type<Currency>().default(Currency.USDT).notNull(),
         language: text("language", { enum: LANGUAGES }).$type<Language>().default(Language.EN_US).notNull(),
-        referralCode: varchar("referral_code", { length: 14 }).unique(),
         referredBy: uuid("referred_by").references((): AnyPgColumn => users.id, { onDelete: "set null" }),
         isActive: boolean("is_active").default(true),
         isAmbassador: boolean("is_ambassador").default(false),

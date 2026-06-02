@@ -7,9 +7,8 @@
  */
 
 export enum EmailProvider {
-    SENDGRID = "sendgrid",
     SMTP = "smtp",
-    SES = "ses"
+    RESEND = "resend",
 }
 
 export interface EmailAttachment {
@@ -19,20 +18,35 @@ export interface EmailAttachment {
 }
 
 export interface SendEmailRequest {
-    from: string;
+    from?: string;
     fromName?: string;
     to: string;
     subject: string;
     html: string;
     attachments?: EmailAttachment[];
+
+    // Resend-native (optional — ignored by non-Resend providers)
+    scheduledAt?: string; // ISO-8601 future timestamp for scheduled delivery
+    tags?: { name: string; value: string }[];
+    listUnsubscribeHeader?: string; // e.g. "<mailto:unsub@jeroidpay.com>, <https://...>"
+    testMode?: boolean; // redirect to Resend test sink, no real delivery
 }
+
+export type BatchEmailRequest = SendEmailRequest[];
 
 export interface SendEmailResponse {
     success: boolean;
     messageId?: string;
     provider: string;
+    from?: string;
     error?: Error;
     errorCode?: string;
+}
+
+export interface SendBatchEmailResponse {
+    results: SendEmailResponse[];
+    successCount: number;
+    failureCount: number;
 }
 
 export interface IEmailProvider {
@@ -42,11 +56,15 @@ export interface IEmailProvider {
     readonly name: EmailProvider;
 
     /**
-     * Send an email through this provider
-     * @param request Email request details
-     * @returns Promise with send result
+     * Send a single email through this provider
      */
     send(request: SendEmailRequest): Promise<SendEmailResponse>;
+
+    /**
+     * Send multiple emails in a single batch (optional — providers that don't support it
+     * will fall back to sequential sends)
+     */
+    sendBatch?(requests: BatchEmailRequest): Promise<SendBatchEmailResponse>;
 
     /**
      * Verify the provider connection/configuration

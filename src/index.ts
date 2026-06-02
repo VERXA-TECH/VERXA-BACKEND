@@ -20,7 +20,7 @@ import passport from "passport";
 import path from "path";
 import "./config/db";
 import envConfig from "./config/env";
-import { FirebaseAdmin } from "./config/firebase";
+// import { FirebaseAdmin } from "./config/firebase";
 import logger from "./config/logger";
 import "./config/oauth";
 import { getRedisClient } from "./config/redis";
@@ -95,7 +95,7 @@ if (envConfig.env !== "production") {
 (async () => {
     try {
         await getRedisClient();
-        await FirebaseAdmin.initialize();
+        // await FirebaseAdmin.initialize();
         initPurgeOldQuotesJob();
         initIdempotencyCleanup();
       

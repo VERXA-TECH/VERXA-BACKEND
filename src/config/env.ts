@@ -11,8 +11,8 @@ function requireEnv(name: string, value: string | undefined): string {
             "Critical environment variable missing",
             withOperationContext("system", {
                 variable: name,
-                action: "environment_variable_missing"
-            })
+                action: "environment_variable_missing",
+            }),
         );
         console.error(`Environment variable ${name} is not set`);
         process.exit(1);
@@ -44,7 +44,7 @@ function parseDbUrl(dbUrl: string) {
             port: port,
             name: name,
             ssl: ssl,
-            action: "database_connection_details_loaded"
+            action: "database_connection_details_loaded",
         });
 
         return { url: dbUrl, host, port, user, password, name, ssl };
@@ -140,10 +140,6 @@ const envConfig = {
         fromName: process.env.SMTP_FROM_NAME || "Verxa",
         adminEmail: process.env.ADMIN_EMAIL || "admin@verxa.com",
         supportEmail: process.env.SUPPORT_EMAIL || "support@verxa.com",
-
-        sendgridApiKey: process.env.SENDGRID_API_KEY || "",
-        sendgridWebhookSecret: process.env.SENDGRID_WEBHOOK_SECRET || "",
-
         smtp: {
             host: process.env.SMTP_EMAIL_HOST || process.env.SMTP_HOST || "smtp.sendgrid.net",
             port: toNumber(process.env.SMTP_EMAIL_PORT || process.env.SMTP_PORT, 587),
@@ -151,10 +147,10 @@ const envConfig = {
             user: process.env.SMTP_EMAIL_USER || process.env.SMTP_USER || "apikey",
             password: process.env.SMTP_EMAIL_PASSWORD || process.env.SMTP_PASSWORD || "",
         },
-
-        ses: {
-            region: process.env.AWS_SES_REGION || process.env.AWS_REGION || "",
-            profile: process.env.AWS_SES_PROFILE || process.env.AWS_PROFILE || "",
+        resend: {
+            apiKey: process.env.RESEND_API_KEY || "",
+            from: process.env.RESEND_DEFAULT_FROM || "",
+            fromName: process.env.RESEND_DEFAULT_FROM_NAME || "Verxa",
         },
 
         host: process.env.SMTP_HOST || "smtp.sendgrid.net",
@@ -196,7 +192,7 @@ const envConfig = {
         sesConfigurationSet: process.env.AWS_SES_CONFIGURATION_SET || "default",
     },
     firebase: {
-        serviceAccountJson: requireEnv("FIREBASE_SERVICE_ACCOUNT", process.env.FIREBASE_SERVICE_ACCOUNT),
+        serviceAccountJson: "",
     },
 
     adminEmail: process.env.ADMIN_EMAIL || "admin@verxa.com",

@@ -3,6 +3,7 @@ import { Routes } from "../types/app.types";
 import AuthRouter from "./auth.routes";
 import UserRouter from "./user.routes";
 import OtpRouter from "./otp.routes";
+import VerxatagRouter from "./verxatag.routes";
 
 const AppRouter = express.Router();
 
@@ -18,6 +19,10 @@ const appRoutes: Routes = [
     {
         path: "/otp",
         router: OtpRouter,
+    },
+    {
+        path: "/verxatags",
+        router: VerxatagRouter,
     },
 ];
 

@@ -11,6 +11,8 @@ import BaseOtpService from "./otp/index.service";
 import AuthHelper from "../utils/helpers/auth.helper";
 import EmailQueue from "../queues/email.queue";
 import { OtpType } from "../utils/constants/otp";
+import { VerxatagRepository } from "../repository/verxatag";
+import { VerxatagStatus } from "../db/schema/verxatag/index.schema";
 
 export class OtpService {
     private userRepository = new UserRepository();
@@ -61,24 +63,33 @@ export class OtpService {
         let responseData: any = {};
 
         if (purpose === "signup_verification") {
-            // Update User as verified
-            let referralCode = user.referralCode;
-            if (!referralCode) {
-                const generateCode = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 7);
-                referralCode = `VX-${generateCode()}`;
-                let exists = await this.userRepository.findByReferralCode(referralCode);
-                let attempts = 0;
-                while (exists && attempts < 10) {
-                    referralCode = `VX-${generateCode()}`;
-                    exists = await this.userRepository.findByReferralCode(referralCode);
-                    attempts++;
-                }
+            // Auto-generate the user's initial active Verxatag (which serves as their username/referral code)
+            const generateCode = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 7);
+            let claimUsername = `vx-${generateCode().toLowerCase()}`;
+
+            const verxatagRepo = new VerxatagRepository();
+            let exists = await verxatagRepo.findActiveByUsername(claimUsername);
+            let attempts = 0;
+            while (exists && attempts < 10) {
+                claimUsername = `vx-${generateCode().toLowerCase()}`;
+                exists = await verxatagRepo.findActiveByUsername(claimUsername);
+                attempts++;
             }
 
-            await this.userRepository.update(user.id, {
-                emailVerified: true,
-                emailVerifiedAt: new Date(),
-                referralCode,
+            // Create active Verxatag and update user email verification and username
+            await verxatagRepo.client.transaction(async (tx) => {
+                await verxatagRepo.create({
+                    userId: user.id,
+                    username: claimUsername,
+                    changeCount: 0,
+                    status: VerxatagStatus.ACTIVE,
+                }, tx);
+
+                await this.userRepository.update(user.id, {
+                    emailVerified: true,
+                    emailVerifiedAt: new Date(),
+                    username: `@${claimUsername}`,
+                }, tx);
             });
 
             // Queue welcome email
@@ -141,7 +152,7 @@ export class OtpService {
                 user: {
                     id: user.id,
                     email: user.email,
-                    referralCode,
+                    username: `@${claimUsername}`,
                 },
             };
         }

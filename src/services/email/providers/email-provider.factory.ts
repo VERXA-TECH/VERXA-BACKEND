@@ -2,9 +2,8 @@
 import envConfig from "../../../config/env";
 import logger from "../../../config/logger";
 import { EmailProvider, IEmailProvider, SendEmailRequest, SendEmailResponse } from "./email-provider.interface";
-import { SendGridProvider } from "./sendgrid.provider";
 import { SmtpProvider } from "./smtp.provider";
-import { SesProvider } from "./ses.provider";
+import { ResendProvider } from "./resend.provider";
 
 /**
  * Email Provider Factory with Intelligent Fallback
@@ -78,7 +77,7 @@ export class EmailProviderFactory {
             .split(",")
             .map((p) => p.trim().toLowerCase())
             .filter((p) => p.length > 0);
-        const validProviders = [EmailProvider.SENDGRID, EmailProvider.SMTP, EmailProvider.SES];
+        const validProviders = [EmailProvider.RESEND];
         const filtered = providers.filter((p) => {
             if (!validProviders.includes(p as EmailProvider)) {
                 logger.warn(`Invalid provider name: ${p}`, {
@@ -90,12 +89,12 @@ export class EmailProviderFactory {
             return true;
         });
 
-        // If no valid providers, default to sendgrid
+
         if (filtered.length === 0) {
             logger.warn("No valid providers configured, defaulting to sendgrid", {
                 action: "default_provider_fallback"
             });
-            return ["sendgrid"];
+            return ["smtp"];
         }
 
         return filtered;
@@ -103,27 +102,26 @@ export class EmailProviderFactory {
 
     private createProvider(name: string): IEmailProvider | null {
         switch (name) {
-            case EmailProvider.SENDGRID:
-                return new SendGridProvider(envConfig.email.sendgridApiKey);
-
+         
             case EmailProvider.SMTP:
                 return new SmtpProvider({
                     host: envConfig.email.smtp.host,
                     port: envConfig.email.smtp.port,
                     secure: envConfig.email.smtp.secure,
                     user: envConfig.email.smtp.user,
-                    password: envConfig.email.smtp.password
+                    password: envConfig.email.smtp.password,
                 });
 
-            case EmailProvider.SES:
-                return new SesProvider({
-                    region: envConfig.email.ses.region,
-                    profile: envConfig.email.ses.profile
-                });
+            case EmailProvider.RESEND:
+                return new ResendProvider(
+                    envConfig.email.resend.apiKey,
+                    envConfig.email.resend.from,
+                    envConfig.email.resend.fromName,
+                );
 
             default:
                 logger.error(`Unknown provider type: ${name}`, {
-                    action: "unknown_provider_type"
+                    action: "unknown_provider_type",
                 });
                 return null;
         }

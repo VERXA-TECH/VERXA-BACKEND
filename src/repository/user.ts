@@ -28,7 +28,6 @@ export type PublicUser = Pick<
     | "lastName"
     | "phoneNumber"
     | "country"
-    | "referralCode"
     | "referredBy"
     | "isActive"
     | "emailVerified"
@@ -148,7 +147,6 @@ export class UserRepository {
                 lastName: users.lastName,
                 phoneNumber: users.phoneNumber,
                 country: users.country,
-                referralCode: users.referralCode,
                 referredBy: users.referredBy,
                 isActive: users.isActive,
                 emailVerified: users.emailVerified,
@@ -216,11 +214,6 @@ export class UserRepository {
         return result[0];
     }
 
-    async findByReferralCode(referralCode: string, db: DbClient = this.db): Promise<User | undefined> {
-        const result = await db.select().from(users).where(eq(users.referralCode, referralCode)).limit(1);
-        return result[0];
-    }
-
     async create(userData: NewUser, db: DbClient = this.db): Promise<User> {
         const result = await db.insert(users).values(userData).returning();
         return result[0];
@@ -278,8 +271,8 @@ export class UserRepository {
         await this.db.update(users).set({ currency }).where(eq(users.id, userId));
     }
 
-    async update(userId: string, data: Partial<User>): Promise<void> {
-        await this.db.update(users).set(data).where(eq(users.id, userId));
+    async update(userId: string, data: Partial<User>, db: DbClient = this.db): Promise<void> {
+        await db.update(users).set(data).where(eq(users.id, userId));
     }
 
     async updateAmbassadorStatus(userId: string, isAmbassador: boolean) {
@@ -577,32 +570,5 @@ export class UserRepository {
             pnd: Number(result?.pnd || 0),
             archived: Number(result?.archived || 0),
         };
-    }
-
-    async checkDuplicateReferralCode(referralCode: string, db: DbClient = this.db): Promise<boolean> {
-        const [userExists] = await Promise.all([
-            db.select({ id: users.id }).from(users).where(eq(users.referralCode, referralCode)).limit(1),
-        ]);
-        return userExists.length > 0;
-    }
-
-    async generateUniqueReferralCode(length = 5, db: DbClient = this.db): Promise<string> {
-       
-        const generate = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ", length);
-        let code = generate();
-        let exists = await this.checkDuplicateReferralCode(code, db);
-
-        let attempts = 0;
-        while (exists && attempts < 10) {
-            code = generate();
-            exists = await this.checkDuplicateReferralCode(code, db);
-            attempts++;
-        }
-
-        if (exists) {
-            throw new Error("Failed to generate a unique referral code after 10 attempts");
-        }
-
-        return code;
     }
 }

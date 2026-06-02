@@ -18,3 +18,6 @@ export * from "./kyc/kyc.schema";
 export * from "./devices.schema";
 export * from "./device-trust-token-history.schema";
 export * from "./assets.schema";
+export * from "./verxatag/index.schema";
+export * from "./verxatag/history.schema";
+export * from "./verxatag/reserved.schema";
