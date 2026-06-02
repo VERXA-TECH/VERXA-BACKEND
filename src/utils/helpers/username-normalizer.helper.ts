@@ -3,7 +3,7 @@ import { usernameRegex } from "../../config/username.regex";
 export default class UsernameNormalizer {
     static normalize(username: string): string {
         let normalized = username.replace(/^@/, "").toLowerCase();
-        normalized = normalized.replace(/[^a-z0-9]/g, "");
+        normalized = normalized.replace(/[^a-z0-9_]/g, "");
         return normalized;
     }
     static validate(username: string): boolean {

@@ -15,9 +15,16 @@ export default class AuthController {
             return next(new AppError(validation.error.message, ResponseHelper.BAD_REQUEST));
         }
 
-        const { email, country, deviceInfo } = req.body;
+        const { email, country, deviceInfo, referralCode } = req.body;
         const authService = new AuthService();
-        const result = await authService.signup(email, country, deviceInfo, req.ip || "", req.get("User-Agent") || "");
+        const result = await authService.signup(
+            email,
+            country,
+            deviceInfo,
+            req.ip || "",
+            req.get("User-Agent") || "",
+            referralCode || undefined
+        );
 
         ResponseHelper.sendSuccessResponse(res, {
             message: "Signup initiated. Verification code sent to your email.",

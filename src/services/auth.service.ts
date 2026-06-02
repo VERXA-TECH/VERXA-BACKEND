@@ -5,14 +5,30 @@ import { UserRepository } from "../repository/user";
 import { UserDeviceRepository } from "../repository/device";
 import OtpService from "./otp/index.service";
 import { UserDeviceStatus } from "../db/schema/devices.schema";
+import { VerxatagRepository } from "../repository/verxatag";
 
 export class AuthService {
     private userRepository = new UserRepository();
     private userDeviceRepository = new UserDeviceRepository();
     private otpService = new OtpService();
 
-    async signup(email: string, country: string, deviceInfo: any, ip: string, userAgent: string) {
+    async signup(email: string, country: string, deviceInfo: any, ip: string, userAgent: string, referralCode?: string) {
         const normalizedEmail = email.trim().toLowerCase();
+
+        // Validate referral code if provided
+        let referrerUserId: string | null = null;
+        if (referralCode) {
+            const verxatagRepo = new VerxatagRepository();
+            const activeVerxatag = await verxatagRepo.findActiveByUsername(referralCode.trim());
+            if (!activeVerxatag) {
+                throw new AppError("Invalid referral code.", ResponseHelper.BAD_REQUEST);
+            }
+            const referrerUser = await this.userRepository.findById(activeVerxatag.userId);
+            if (!referrerUser || !referrerUser.isActive || !referrerUser.emailVerified) {
+                throw new AppError("Referrer account is not active or verified.", ResponseHelper.BAD_REQUEST);
+            }
+            referrerUserId = referrerUser.id;
+        }
 
         let user = await this.userRepository.findByEmail(normalizedEmail);
 
@@ -25,12 +41,18 @@ export class AuthService {
                 await this.userRepository.update(user.id, { country });
                 user.country = country;
             }
+            // Update referrer if provided and not already set
+            if (referrerUserId && !user.referredBy) {
+                await this.userRepository.update(user.id, { referredBy: referrerUserId });
+                user.referredBy = referrerUserId;
+            }
         } else {
             // Create user
             user = await this.userRepository.create({
                 email: normalizedEmail,
                 country,
                 emailVerified: false,
+                referredBy: referrerUserId || undefined
             });
         }
 

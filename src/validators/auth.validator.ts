@@ -27,7 +27,13 @@ const signupSchema = z.object({
     country: z.literal("NG", {
         errorMap: () => ({ message: "Only Nigeria (NG) is supported as a country code." })
     }),
-    deviceInfo: deviceInfoSchema
+    deviceInfo: deviceInfoSchema,
+    referralCode: z
+        .string()
+        .regex(/^[a-zA-Z0-9_]{3,30}$/, "Referral code must be alphanumeric with underscores, between 3 and 30 characters")
+        .optional()
+        .nullable()
+        .or(z.literal(""))
 });
 
 const otpPurposeEnum = z.enum([

@@ -868,4 +868,36 @@ export const adminLoginRateLimiter = createRateLimiter({
     }
 });
 
+export const profilePasswordRateLimiter = createRateLimiter({
+    keyPrefix: "rl:profile:password",
+    points: 5,
+    duration: 60 * 60,
+    blockDuration: 60 * 60,
+    keyGenerator: (req) => {
+        const userId = (req as any).userId;
+        if (!userId) {
+            const xff = req.headers["x-forwarded-for"];
+            const forwarded = Array.isArray(xff) ? xff[0] : xff;
+            return String(req.ip || forwarded || req.socket.remoteAddress || "unknown");
+        }
+        return `user:${userId}`;
+    }
+});
+
+export const profilePurposesRateLimiter = createRateLimiter({
+    keyPrefix: "rl:profile:purposes",
+    points: 5,
+    duration: 60 * 60,
+    blockDuration: 60 * 60,
+    keyGenerator: (req) => {
+        const userId = (req as any).userId;
+        if (!userId) {
+            const xff = req.headers["x-forwarded-for"];
+            const forwarded = Array.isArray(xff) ? xff[0] : xff;
+            return String(req.ip || forwarded || req.socket.remoteAddress || "unknown");
+        }
+        return `user:${userId}`;
+    }
+});
+
 export default createRateLimiter;

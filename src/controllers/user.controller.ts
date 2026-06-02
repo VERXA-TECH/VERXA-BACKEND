@@ -8,7 +8,8 @@ export default class UserController {
     static updateBasicProfile = ControllerHelper.createHandler("updateBasicProfile", async (req, res, next) => {
         const validation = UserValidator.basicProfile(req.body);
         if (validation.error) {
-            return next(new AppError(validation.error.message, ResponseHelper.BAD_REQUEST));
+            const message = validation.error.errors?.[0]?.message || "Validation failed";
+            return next(new AppError(message, ResponseHelper.BAD_REQUEST));
         }
 
         const userId = req.userId;
@@ -28,7 +29,8 @@ export default class UserController {
     static createPassword = ControllerHelper.createHandler("createPassword", async (req, res, next) => {
         const validation = UserValidator.createPassword(req.body);
         if (validation.error) {
-            return next(new AppError(validation.error.message, ResponseHelper.BAD_REQUEST));
+            const message = validation.error.errors?.[0]?.message || "Validation failed";
+            return next(new AppError(message, ResponseHelper.BAD_REQUEST));
         }
 
         const userId = req.userId;
@@ -49,7 +51,8 @@ export default class UserController {
     static updatePurposes = ControllerHelper.createHandler("updatePurposes", async (req, res, next) => {
         const validation = UserValidator.updatePurposes(req.body);
         if (validation.error) {
-            return next(new AppError(validation.error.message, ResponseHelper.BAD_REQUEST));
+            const message = validation.error.errors?.[0]?.message || "Validation failed";
+            return next(new AppError(message, ResponseHelper.BAD_REQUEST));
         }
 
         const userId = req.userId;

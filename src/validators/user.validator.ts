@@ -41,8 +41,8 @@ export const usernameSchema = z
     })
     .trim()
     .min(3, "Username must be at least 3 characters")
-    .max(20, "Username must be at most 20 characters")
-    .regex(/^[a-z0-9](?:[a-z0-9]{1,18}[a-z0-9])?$/, "Invalid username format")
+    .max(30, "Username must be at most 30 characters")
+    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain alphanumeric characters and underscores")
     .transform((v) => v.toLowerCase());
 
 export type UsernameDTO = z.infer<typeof usernameSchema>;
@@ -339,7 +339,7 @@ export const basicProfileSchema = z.object({
         .regex(/^\+234[789][01]\d{8}$/, "Phone number must be a valid Nigerian number in international format (+234...)"),
     referralCode: z
         .string()
-        .regex(/^VX-[A-Z0-9]{7}$/, "Referral code format must be VX-{7 characters}")
+        .regex(/^[a-zA-Z0-9_]{3,30}$/, "Referral code must be alphanumeric with underscores, between 3 and 30 characters")
         .optional()
         .nullable()
         .or(z.literal(""))

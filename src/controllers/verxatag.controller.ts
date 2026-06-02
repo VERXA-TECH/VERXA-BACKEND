@@ -8,7 +8,8 @@ export default class VerxatagController {
     static checkAvailability = ControllerHelper.createHandler("checkAvailability", async (req, res, next) => {
         const validation = VerxatagValidator.checkAvailability(req.query);
         if (validation.error) {
-            return next(new AppError(validation.error.message, ResponseHelper.BAD_REQUEST));
+               const message = validation.error.message || "Validation failed";
+            return next(new AppError(message, ResponseHelper.BAD_REQUEST));
         }
 
         const { username } = req.query as { username: string };
@@ -26,7 +27,8 @@ export default class VerxatagController {
     static claim = ControllerHelper.createHandler("claim", async (req, res, next) => {
         const validation = VerxatagValidator.claim(req.body);
         if (validation.error) {
-            return next(new AppError(validation.error.message, ResponseHelper.BAD_REQUEST));
+            const message = validation.error.message || "Validation failed";
+            return next(new AppError(message, ResponseHelper.BAD_REQUEST));
         }
 
         const { username } = req.body;
@@ -47,7 +49,8 @@ export default class VerxatagController {
     static update = ControllerHelper.createHandler("update", async (req, res, next) => {
         const validation = VerxatagValidator.update(req.body);
         if (validation.error) {
-            return next(new AppError(validation.error.message, ResponseHelper.BAD_REQUEST));
+            const message = validation.error.message || "Validation failed";
+            return next(new AppError(message, ResponseHelper.BAD_REQUEST));
         }
 
         const { username, transactionPin } = req.body;

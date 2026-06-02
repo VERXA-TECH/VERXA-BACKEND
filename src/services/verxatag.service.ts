@@ -59,7 +59,7 @@ export class VerxatagService {
         if (!UsernameNormalizer.validate(normalizedUsername)) {
             return {
                 available: false,
-                reason: "Username must be between 3 and 30 characters and contain only alphanumeric characters, underscores, hyphens, or dots",
+                reason: "Username must be between 3 and 30 characters and contain only alphanumeric characters and underscores",
                 normalizedUsername,
                 displayUsername: UsernameNormalizer.formatDisplayName(normalizedUsername)
             };
