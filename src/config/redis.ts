@@ -82,6 +82,12 @@ export default class RedisManager {
                 logger.info("Redis connecting...", withOperationContext("system", { action: "redis_connecting" }));
             });
 
+             this.client.defineCommand("incrWithExpire", {
+                 numberOfKeys: 1,
+                 lua: "local v = redis.call('INCR', KEYS[1]); redis.call('EXPIRE', KEYS[1], ARGV[1]); return v",
+             });
+
+
             this.client.on("error", (error) => {
                 logger.error(
                     "Redis connection error:",

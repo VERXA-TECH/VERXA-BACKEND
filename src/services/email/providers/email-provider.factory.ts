@@ -69,10 +69,10 @@ export class EmailProviderFactory {
     /**
      * Parse provider configuration from env
      * Supports comma-separated list for fallback chain
-     * Example: "sendgrid,smtp,ses" will try SendGrid first, then SMTP, then SES
+     * Example: "sendgrid,smtp,ses" will try SMTP, then SES
      */
     private parseProviderConfig(): string[] {
-        const providerConfig = envConfig.email.provider || "sendgrid";
+        const providerConfig = envConfig.email.provider || "smtp";
         const providers = providerConfig
             .split(",")
             .map((p) => p.trim().toLowerCase())

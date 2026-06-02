@@ -1,5 +1,4 @@
-import crypto from "node:crypto";
-import { customAlphabet } from "nanoid";
+import crypto from "node:crypto"
 import logger from "../config/logger";
 import AppError from "../utils/appError";
 import ResponseHelper from "../utils/helpers/response.helper";
@@ -11,8 +10,6 @@ import BaseOtpService from "./otp/index.service";
 import AuthHelper from "../utils/helpers/auth.helper";
 import EmailQueue from "../queues/email.queue";
 import { OtpType } from "../utils/constants/otp";
-import { VerxatagRepository } from "../repository/verxatag";
-import { VerxatagStatus } from "../db/schema/verxatag/index.schema";
 
 export class OtpService {
     private userRepository = new UserRepository();
@@ -33,11 +30,7 @@ export class OtpService {
             throw new AppError("Email is already verified.", ResponseHelper.BAD_REQUEST);
         }
 
-        const otpResult = await this.baseOtpService.generateAndSendOtp(
-            normalizedEmail,
-            purpose,
-            normalizedEmail
-        );
+        const otpResult = await this.baseOtpService.generateAndSendOtp(normalizedEmail, purpose, normalizedEmail);
 
         if (!otpResult.success) {
             throw new AppError(otpResult.message || "Failed to send OTP.", ResponseHelper.INTERNAL_SERVER_ERROR);
@@ -63,33 +56,9 @@ export class OtpService {
         let responseData: any = {};
 
         if (purpose === "signup_verification") {
-            // Auto-generate the user's initial active Verxatag (which serves as their username/referral code)
-            const generateCode = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 7);
-            let claimUsername = `vx-${generateCode().toLowerCase()}`;
-
-            const verxatagRepo = new VerxatagRepository();
-            let exists = await verxatagRepo.findActiveByUsername(claimUsername);
-            let attempts = 0;
-            while (exists && attempts < 10) {
-                claimUsername = `vx-${generateCode().toLowerCase()}`;
-                exists = await verxatagRepo.findActiveByUsername(claimUsername);
-                attempts++;
-            }
-
-            // Create active Verxatag and update user email verification and username
-            await verxatagRepo.client.transaction(async (tx) => {
-                await verxatagRepo.create({
-                    userId: user.id,
-                    username: claimUsername,
-                    changeCount: 0,
-                    status: VerxatagStatus.ACTIVE,
-                }, tx);
-
-                await this.userRepository.update(user.id, {
-                    emailVerified: true,
-                    emailVerifiedAt: new Date(),
-                    username: `@${claimUsername}`,
-                }, tx);
+            await this.userRepository.update(user.id, {
+                emailVerified: true,
+                emailVerifiedAt: new Date(),
             });
 
             // Queue welcome email
@@ -123,7 +92,7 @@ export class OtpService {
                         trustRecord.issuedAt,
                         trustRecord.expiresAt,
                         user.country || undefined,
-                        ip
+                        ip,
                     );
 
                     await this.deviceTrustTokenHistoryRepository.add({
@@ -140,7 +109,7 @@ export class OtpService {
                         refreshHash,
                         refreshExpiry,
                         user.country || undefined,
-                        ip
+                        ip,
                     );
                 }
             }
@@ -152,7 +121,6 @@ export class OtpService {
                 user: {
                     id: user.id,
                     email: user.email,
-                    username: `@${claimUsername}`,
                 },
             };
         }
