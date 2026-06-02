@@ -15,13 +15,11 @@ const EmailQueue: Bull.Queue<EmailJobData> = new Bull(`EMAIL-queue-${envConfig.e
     createClient: (type) => {
         if (type === "client") {
             return new Redis(envConfig.redis.url, {
-                lazyConnect: true,
                 enableReadyCheck: true,
                 maxRetriesPerRequest: 3
             });
         }
         return new Redis(envConfig.redis.url, {
-            lazyConnect: true,
             enableReadyCheck: false,
             maxRetriesPerRequest: null
         });

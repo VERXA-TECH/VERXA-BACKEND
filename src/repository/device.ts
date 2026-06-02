@@ -34,6 +34,16 @@ export class UserDeviceRepository {
         return res[0];
     }
 
+    async findLatestPendingByUserId(userId: string): Promise<UserDevice | undefined> {
+        const res = await this.db
+            .select()
+            .from(userDevices)
+            .where(and(eq(userDevices.userId, userId), eq(userDevices.status, UserDeviceStatus.PENDING)))
+            .orderBy(desc(userDevices.createdAt))
+            .limit(1);
+        return res[0];
+    }
+
     async findById(id: string): Promise<UserDevice | undefined> {
         const res = await this.db.select().from(userDevices).where(eq(userDevices.id, id)).limit(1);
         return res[0];

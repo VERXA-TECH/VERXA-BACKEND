@@ -427,7 +427,8 @@ export class EmailService {
                     month: "long",
                     day: "numeric"
                 }),
-                supportEmail: envConfig.email.supportEmail
+                supportEmail: envConfig.email.supportEmail,
+                year: new Date().getFullYear()
             }
         });
     }

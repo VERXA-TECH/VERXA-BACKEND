@@ -17,5 +17,16 @@
     "files": [
         "./src/types/express.d.ts",
     ],
+    "exclude": [
+        "src/config/knex.ts",
+        "src/services/email/providers/ses.provider.ts",
+        "src/utils/geo.util.ts",
+        "src/utils/audit-context.ts",
+        "src/utils/helpers/admin/transaction.helper.ts",
+        "src/utils/helpers/approval.helper.ts",
+        "src/utils/helpers/asset.helper.ts",
+        "src/utils/helpers/document.helper.ts",
+        "src/utils/helpers/export.helper.ts"
+    ]
 }
 

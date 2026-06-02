@@ -77,7 +77,7 @@ export class EmailProviderFactory {
             .split(",")
             .map((p) => p.trim().toLowerCase())
             .filter((p) => p.length > 0);
-        const validProviders = [EmailProvider.RESEND];
+        const validProviders = [EmailProvider.RESEND, EmailProvider.SMTP];
         const filtered = providers.filter((p) => {
             if (!validProviders.includes(p as EmailProvider)) {
                 logger.warn(`Invalid provider name: ${p}`, {

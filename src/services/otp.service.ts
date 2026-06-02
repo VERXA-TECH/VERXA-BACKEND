@@ -79,39 +79,43 @@ export class OtpService {
 
             // Handle Device Trust Activation
             let deviceTrustToken = null;
+            let device = null;
             if (deviceInfo && deviceInfo.uniqueId) {
-                const device = await this.userDeviceRepository.findByDeviceId(deviceInfo.uniqueId, user.id);
-                if (device) {
-                    const trustRecord = await this.deviceTrustService.createTrustRecord();
-                    deviceTrustToken = trustRecord.token;
+                device = await this.userDeviceRepository.findByDeviceId(deviceInfo.uniqueId, user.id);
+            } else {
+                device = await this.userDeviceRepository.findLatestPendingByUserId(user.id);
+            }
 
-                    await this.userDeviceRepository.activateTrustedDevice(
-                        device.id,
-                        user.id,
-                        trustRecord.tokenHash,
-                        trustRecord.issuedAt,
-                        trustRecord.expiresAt,
-                        user.country || undefined,
-                        ip,
-                    );
+            if (device) {
+                const trustRecord = await this.deviceTrustService.createTrustRecord();
+                deviceTrustToken = trustRecord.token;
 
-                    await this.deviceTrustTokenHistoryRepository.add({
-                        deviceId: device.id,
-                        tokenHash: trustRecord.tokenHash,
-                        expiresAt: trustRecord.expiresAt,
-                    });
+                await this.userDeviceRepository.activateTrustedDevice(
+                    device.id,
+                    user.id,
+                    trustRecord.tokenHash,
+                    trustRecord.issuedAt,
+                    trustRecord.expiresAt,
+                    user.country || undefined,
+                    ip,
+                );
 
-                    const refreshExpiry = new Date(Date.now() + AuthHelper.refreshExpiresMs());
-                    const refreshHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
-                    await this.userDeviceRepository.rotateRefreshToken(
-                        device.id,
-                        jti,
-                        refreshHash,
-                        refreshExpiry,
-                        user.country || undefined,
-                        ip,
-                    );
-                }
+                await this.deviceTrustTokenHistoryRepository.add({
+                    deviceId: device.id,
+                    tokenHash: trustRecord.tokenHash,
+                    expiresAt: trustRecord.expiresAt,
+                });
+
+                const refreshExpiry = new Date(Date.now() + AuthHelper.refreshExpiresMs());
+                const refreshHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
+                await this.userDeviceRepository.rotateRefreshToken(
+                    device.id,
+                    jti,
+                    refreshHash,
+                    refreshExpiry,
+                    user.country || undefined,
+                    ip,
+                );
             }
 
             responseData = {

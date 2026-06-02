@@ -8,13 +8,11 @@ const DailyQueue: Bull.Queue<Record<string, never>> = new Bull(`REPORT-queue-${e
     createClient: (type) => {
         if (type === "client") {
             return new Redis(envConfig.redis.url, {
-                lazyConnect: true,
                 enableReadyCheck: true,
                 maxRetriesPerRequest: 3
             });
         }
         return new Redis(envConfig.redis.url, {
-            lazyConnect: true,
             enableReadyCheck: false,
             maxRetriesPerRequest: null
         });
